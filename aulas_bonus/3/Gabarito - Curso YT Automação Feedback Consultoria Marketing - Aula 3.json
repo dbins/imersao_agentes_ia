@@ -1,0 +1,451 @@
+{
+  "name": "Curso YT Automação Feedback Consultoria Marketing - Aula 3",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 21
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ff30c91a-952d-42c2-87a7-a5be444abf1f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qbC5IiSBsy96O48KHJIQ1j-CU7ZheX650pSFphiw8zc",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2064530308,
+          "mode": "list",
+          "cachedResultName": "Respostas ao formulário 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qbC5IiSBsy96O48KHJIQ1j-CU7ZheX650pSFphiw8zc/edit#gid=2064530308"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Por qual consultor você foi atendido?",
+              "lookupValue": "João"
+            },
+            {
+              "lookupColumn": "Data",
+              "lookupValue": "={{ $now.toFormat('dd/MM/yyyy') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5db9eb2b-803d-4b49-88a4-cf4ea1a61f6e",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZZriIOrQRG9FBI7e",
+          "name": "Google Sheets - Alon Hashtag Treinamentos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "average",
+              "field": "Em uma escala de 1 a 10, quão satisfeito(a) você ficou com a experiência geral da consultoria de hoje?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "679872e8-b698-4379-8416-f7f212145c24",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "306b06e9-b6fe-458f-ac78-ebc85db07d19",
+              "leftValue": "={{ $json['average_Em_uma_escala_de_1_a_10,_quão_satisfeito(a)_você_ficou_com_a_experiência_geral_da_consultoria_de_hoje?'] }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "acc8180c-229c-4de1-b372-6bc21d8fc0fc",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        896,
+        208
+      ],
+      "id": "8337aeaf-6b3b-4f3a-bee9-55faca03876b",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "sendTo": "alonpinheirohashtag@gmail.com",
+        "subject": "Atenção! Média de hoje abaixo de 7",
+        "message": "={{ $('AI Agent').item.json.output }}",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2112,
+        -96
+      ],
+      "id": "e63e1bf4-0766-4838-bc63-945573d253d3",
+      "name": "Send a message",
+      "webhookId": "740422cd-a69b-4a0e-a2c7-017d533a882a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hkp4uqFGGqFpwOkx",
+          "name": "Gmail Conta Alon Hashtag Treinamentos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1904,
+        -96
+      ],
+      "id": "0c4b8684-11ec-4538-92fe-9e11061d5a2e",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qbC5IiSBsy96O48KHJIQ1j-CU7ZheX650pSFphiw8zc",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2064530308,
+          "mode": "list",
+          "cachedResultName": "Respostas ao formulário 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qbC5IiSBsy96O48KHJIQ1j-CU7ZheX650pSFphiw8zc/edit#gid=2064530308"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Por qual consultor você foi atendido?",
+              "lookupValue": "João"
+            },
+            {
+              "lookupColumn": "Data",
+              "lookupValue": "={{ $now.toFormat('dd/MM/yyyy') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1664,
+        -96
+      ],
+      "id": "5dabacdb-182f-4297-af54-a0500b11deee",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZZriIOrQRG9FBI7e",
+          "name": "Google Sheets - Alon Hashtag Treinamentos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['concatenated_Se_houver,_quais_são_as_sugestões_de_melhoria_para_futuras_consultorias?'] }}",
+        "options": {
+          "systemMessage": "Você é um Supervisor de Qualidade analisando o desempenho de um consultor.\nO objetivo é escrever um e-mail de feedback construtivo, pois a média de satisfação do dia ficou abaixo da meta (Nota < 7).\n\nENTRADA:\nVocê receberá um texto contendo todas as respostas dos clientes à pergunta \"Sugestões de melhoria\", concatenadas.\nPode haver desde zero até dezenas de comentários.\n\nINSTRUÇÕES DE ANÁLISE:\n1. Sintetize os feedbacks: Não liste cada comentário individualmente. Se houver 10 comentários sobre \"atraso\", agrupe em um único ponto de atenção.\n2. Identifique os temas principais: Foque nos padrões (ex: clareza, pontualidade, empatia, domínio técnico).\n3. Se a lista estiver vazia ou com textos irrelevantes (ex: \"não\", \"ok\"), assuma que faltou conexão com o cliente e oriente sobre proatividade.\n4. O tom deve ser profissional, direto e focado em solução (mentoria), não em punição.\n\nFORMATO DE SAÍDA:\nRetorne APENAS o código HTML do corpo do e-mail (sem tags <html>, <head> ou ```).\nUse a seguinte estrutura de tags para organizar o texto:\n- <p> para parágrafos.\n- <b> para destaques importantes.\n- <ul> e <li> para listar os principais pontos de melhoria identificados.\n\nEstrutura do conteúdo:\n1. Saudação e contexto sobre a nota do dia estar abaixo da meta.\n2. Resumo geral do sentimento dos clientes (uma visão macro baseada no que leu).\n3. Lista com os principais pontos de fricção ou melhoria citados (agrupados por tema).\n4. Uma recomendação prática e acionável para a próxima consultoria.\n5. Encerramento\n\nTente ajudar ao máximo nas análises de forma prática para a tomada de ação visando a melhoria do consultor.\n\nObservações:\n\nNão use nomes genéricos como [NOME DO CONSULTOR]. Deixe o e-mail sem nome\nComente que está em anexo a planilha com todos os comentários e avaliações das consultorias do dia de hoje\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1312,
+        -96
+      ],
+      "id": "69aa48c3-7a26-4330-81b8-87137a1a9218",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "Se houver, quais são as sugestões de melhoria para futuras consultorias?",
+              "separateBy": "other",
+              "customSeparator": ";\n\nPRÓXIMO FEEDBACK:"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "507e2162-1a8e-4733-99d9-ed1f7e95c607",
+      "name": "Summarize1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        -288
+      ],
+      "id": "2c88ff08-54a3-4486-9541-a7665d349d6f",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        96
+      ],
+      "id": "7cfe04bb-f897-464f-a951-1511dc90ca83",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9W06H58he36UIJSl",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json['concatenated_Se_houver,_quais_são_as_sugestões_de_melhoria_para_futuras_consultorias?'] }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1472,
+        96
+      ],
+      "id": "9e9534f7-eb7e-457d-b203-9b4cecca9167",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Summarize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "80028a03-fb21-4dd4-a6d5-d313151142aa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "937b859e6b24c13e960e67ec1eaea58b8d1affe11ea0ec3e884228716b2d6ac8"
+  },
+  "id": "1RYenNMZJGZdxHXu",
+  "tags": []
+}

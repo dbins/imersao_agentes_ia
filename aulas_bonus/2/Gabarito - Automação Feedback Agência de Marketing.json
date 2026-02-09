@@ -1,0 +1,287 @@
+{
+  "name": "Automação Feedback Agência de Marketing",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 21
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f6787278-357a-42be-886f-10c312bfd64b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qbC5IiSBsy96O48KHJIQ1j-CU7ZheX650pSFphiw8zc",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2064530308,
+          "mode": "list",
+          "cachedResultName": "Respostas ao formulário 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qbC5IiSBsy96O48KHJIQ1j-CU7ZheX650pSFphiw8zc/edit#gid=2064530308"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Data",
+              "lookupValue": "={{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}"
+            },
+            {
+              "lookupColumn": "Por qual consultor você foi atendido?",
+              "lookupValue": "João"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "be94d8cd-1137-4ca3-ad1a-b427ef52ed3b",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZZriIOrQRG9FBI7e",
+          "name": "Google Sheets - Alon Hashtag Treinamentos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "average",
+              "field": "Em uma escala de 1 a 10, quão satisfeito(a) você ficou com a experiência geral da consultoria de hoje?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "be02f5ff-2999-45e7-95fa-3575e01088e3",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "86e6402b-e5f3-4545-9249-e4e22dd4ad93",
+              "leftValue": "={{ $json['average_Em_uma_escala_de_1_a_10,_quão_satisfeito(a)_você_ficou_com_a_experiência_geral_da_consultoria_de_hoje?'] }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "61973432-c4fd-4751-8fc1-dddbfa4d0b38",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "alonpinheirohashtag@gmail.com",
+        "subject": "Atenção: Média do dia abaixo de 7!",
+        "message": "=Atenção. Atenção. Sua média de notas das consultorias de hoje foi abaixo de 7 ({{ $('Summarize').item.json['average_Em_uma_escala_de_1_a_10,_quão_satisfeito(a)_você_ficou_com_a_experiência_geral_da_consultoria_de_hoje?'] }}) . Favor conferir os feedbacks para acertar as melhorias para as consultorias seguintes.",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1456,
+        -96
+      ],
+      "id": "3011be17-e596-4416-9ac2-7f6f064b0244",
+      "name": "Send a message",
+      "webhookId": "f99c9092-e3f6-4bef-9082-1b17a266eac5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hkp4uqFGGqFpwOkx",
+          "name": "Gmail Conta Alon Hashtag Treinamentos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "f3da72e2-b591-47b7-b23d-1f118cbe051d",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qbC5IiSBsy96O48KHJIQ1j-CU7ZheX650pSFphiw8zc",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2064530308,
+          "mode": "list",
+          "cachedResultName": "Respostas ao formulário 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qbC5IiSBsy96O48KHJIQ1j-CU7ZheX650pSFphiw8zc/edit#gid=2064530308"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Data",
+              "lookupValue": "={{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}"
+            },
+            {
+              "lookupColumn": "Por qual consultor você foi atendido?",
+              "lookupValue": "João"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        -64
+      ],
+      "id": "7a59e6c7-c9bf-42cb-95ba-5c46f377fb60",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZZriIOrQRG9FBI7e",
+          "name": "Google Sheets - Alon Hashtag Treinamentos"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c366105a-3cfd-4e39-bb88-41f6331aca73",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "937b859e6b24c13e960e67ec1eaea58b8d1affe11ea0ec3e884228716b2d6ac8"
+  },
+  "id": "SmhVpfaUTGVK9vXg",
+  "tags": []
+}
